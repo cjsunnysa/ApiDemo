@@ -24,16 +24,17 @@ namespace ApiDemo.Api.Domain.Entities
         public Address DeliveryAddress =>
             Addresses.FirstOrDefault(a => a.IsPostalAddress && a.IsPrimary) ??
             Addresses.FirstOrDefault(a => a.IsResidentialAddress && a.IsPrimary) ??
-            _lastCreatedAddress ??
+            LastCreatedAddress ??
             throw new InvalidDeliveryAddressException($"{FirstName} {LastName}", Id);
         
-        private Address _lastCreatedAddress =>
+        private Address LastCreatedAddress =>
             Addresses
                 .OrderByDescending(a => a.CreatedDate)
                 .FirstOrDefault(a =>
                     (a.IsResidentialAddress && a.IsActive) ||
                     (a.IsPostalAddress && a.IsActive) ||
-                    (a.IsResidentialAddress || a.IsPostalAddress)
+                    a.IsResidentialAddress || 
+                    a.IsPostalAddress
                 );
     }
 }

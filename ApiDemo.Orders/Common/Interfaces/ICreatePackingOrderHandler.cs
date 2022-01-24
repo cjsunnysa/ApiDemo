@@ -1,8 +1,8 @@
-﻿using ApiDemo.Api.Common.Commands;
+﻿using ApiDemo.Api.Domain.Entities;
 
 namespace ApiDemo.Api.Common
 {
-    public interface ICreatePackingOrderHandler : IRequestHandler<CreatePackingOrderCommand, bool>
+    public interface ICreatePackingOrderHandler : IRequestHandler<Order, bool>
     { }
 
 }

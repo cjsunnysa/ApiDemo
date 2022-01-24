@@ -1,4 +1,5 @@
 ﻿using ApiDemo.Api.Common;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,28 +13,30 @@ namespace ApiDemo.Api.Controllers
     [ApiController]
     public class OrderController : BaseController
     {
-        private readonly IRequestHandler<Command, bool> _confirmOrder;
+        private readonly IRequestHandler<Command, OrderDto> _confirmOrder;
+        private readonly IHttpContextAccessor _httpContextAccesor;
 
-        public OrderController(IRequestHandler<Command, bool> confirmOrder)
+        public OrderController(IRequestHandler<Command, OrderDto> confirmOrder, IHttpContextAccessor httpContextAccessor)
         {
             _confirmOrder = confirmOrder;
+            _httpContextAccesor = httpContextAccessor;
         }
 
-        [HttpPatch]
-        [Route("{orderId:int:min(1)}/confirm")]
+        [HttpPost]
+        [Route("{orderId:int:min(1)}/confirmations")]
         public async Task<IActionResult> Confirm(int orderId, CancellationToken cancellationToken)
         {
-            var methodName = "orders/confirm";
+            var methodName = "orders/confirmations";
             
             ValidateIdempotencyKey(methodName);
             
             var command = new Command { OrderId = orderId };
 
-            await _confirmOrder.Handle(command, cancellationToken);
+            OrderDto orderDto = await _confirmOrder.Handle(command, cancellationToken);
 
             SetIdempotentRequestCompleted(methodName);
 
-            return NoContent();
+            return Created($"{_httpContextAccesor.HttpContext.Request.Host.Value}/12345", orderDto);
         }
     }
 }

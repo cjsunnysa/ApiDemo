@@ -12,4 +12,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\Commands\" />
+    <Folder Include="Common\Queries\" />
+  </ItemGroup>
+
 </Project>

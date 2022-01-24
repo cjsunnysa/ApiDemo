@@ -1,7 +1,7 @@
 ﻿using ApiDemo.Api.Common;
-using ApiDemo.Api.Common.Commands;
-using ApiDemo.Api.Common.Dtos.Accounts.GetCustomerDetails;
 using ApiDemo.Api.Domain.Entities;
+using FluentValidation;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +15,7 @@ namespace ApiDemo.Api.Features
             public int OrderId { get; init; }
         }
 
-        public class Handler : IRequestHandler<Command, bool>
+        public class Handler : IRequestHandler<Command, OrderDto>
         {
             private readonly IGetCustomerDetailsHandler _getCustomerDetailsHandler;
             private readonly ICreatePackingOrderHandler _createPackingOrderHandler;
@@ -28,22 +28,50 @@ namespace ApiDemo.Api.Features
                 _createPackingOrderHandler = createShippingHandler;
             }
 
-            public async Task<bool> Handle(Command message, CancellationToken token)
+            public async Task<OrderDto> Handle(Command message, CancellationToken token)
             {
                 // get customer identifier from orders database
                 Order order = GetOrderFromRepository(message.OrderId);
 
-                CustomerDetailsDto customerDetails = await _getCustomerDetailsHandler.Handle(order.CustomerId, token);
+                Customer customer = await _getCustomerDetailsHandler.Handle(order.CustomerId, token);
 
-                Customer customer = customerDetails.MapToCustomer();
-
-                CreatePackingOrderCommand command = MapToCreatePackingOrderCommand(customer, order);
+                order.Customer = customer;
 
                 // this service endpoint would be idempotent in a production environment
                 // which would allow for safe post retries on transient errors
-                await _createPackingOrderHandler.Handle(command, token);
+                await _createPackingOrderHandler.Handle(order, token);
 
-                return true;
+                return MapToOrderDto(order);
+            }
+
+            private static OrderDto MapToOrderDto(Order order)
+            {
+                var deliveryAddress = order.Customer.DeliveryAddress;
+
+                return new OrderDto
+                {
+                    Id = order.Id,
+                    CustomerId = order.CustomerId,
+                    CustomerFirstName = order.Customer.FirstName,
+                    CustomerLastName = order.Customer.LastName,
+                    CustomerTitle = order.Customer.Title,
+                    DeliveryAddressLine1 = deliveryAddress.Line1,
+                    DeliveryAddressLine2 = deliveryAddress.Line2,
+                    DeliveryAddressSuburb = deliveryAddress.Suburb,
+                    DeliveryAddressProvince = deliveryAddress.Province,
+                    DelieryAddressPostalCode = deliveryAddress.PostalCode,
+                    Items = 
+                        order
+                            .Items
+                            .Select(i => new OrderItemDto 
+                            { 
+                                Id = i.Id,
+                                ItemDescription = i.Item.Description,
+                                ItemSize = i.Item.Size,
+                                Quantity = i.Quantity
+                            })
+                            .ToArray(),
+                };
             }
 
             private static Order GetOrderFromRepository(int orderId)
@@ -79,26 +107,6 @@ namespace ApiDemo.Api.Features
                             }
                         },
                     }
-                };
-            }
-
-            private static CreatePackingOrderCommand MapToCreatePackingOrderCommand(Customer customer, Order order)
-            {
-                Address deliveryAddress = customer.DeliveryAddress;
-
-                return new CreatePackingOrderCommand
-                {
-                    CustomerName = customer.FullName,
-                    DeliveryAddressLine1 = deliveryAddress.Line1,
-                    DeliveryAddressLine2 = deliveryAddress.Line2,
-                    DeliveryAddressSuburb = deliveryAddress.Suburb,
-                    DeliveryAddressPostalCode = deliveryAddress.PostalCode,
-                    DeliveryAddressProvince = deliveryAddress.Province.Name,
-                    Items = 
-                        order
-                            .Items
-                            .Select(item => new CreatePackingOrderCommand.PackingOrderItem(item))
-                            .ToArray()
                 };
             }
         }

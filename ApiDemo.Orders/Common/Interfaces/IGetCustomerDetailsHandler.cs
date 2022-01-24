@@ -1,8 +1,7 @@
-﻿
-using ApiDemo.Api.Common.Dtos.Accounts.GetCustomerDetails;
+﻿using ApiDemo.Api.Domain.Entities;
 
 namespace ApiDemo.Api.Common
 {
-    public interface IGetCustomerDetailsHandler : IRequestHandler<int, CustomerDetailsDto>
+    public interface IGetCustomerDetailsHandler : IRequestHandler<int, Customer>
     { }
 }

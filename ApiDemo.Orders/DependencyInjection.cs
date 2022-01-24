@@ -14,7 +14,7 @@ namespace ApiDemo.Api
     {
         public static IServiceCollection AddFeatures(this IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<Features.ConfirmOrder.Command, bool>, Features.ConfirmOrder.Handler>();
+            services.AddScoped<IRequestHandler<Features.ConfirmOrder.Command, OrderDto>, Features.ConfirmOrder.Handler>();
 
             return services;
         }
@@ -32,7 +32,7 @@ namespace ApiDemo.Api
             var baseUrl = configuration.GetValue<string>($"Services:Accounts:BaseUrl");
 
             services
-                .AddHttpClient<IGetCustomerDetailsHandler, GetCustomerDetailsHandler>(ConfigureHttpClient(baseUrl))
+                .AddHttpClient<IGetCustomerDetailsHandler, GetCustomerDetails.Handler>(ConfigureHttpClient(baseUrl))
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5))
                 .AddPolicyHandler(CreateRetryPolicy("Accounts:Endpoints:GetCustomerDetails", configuration))
                 .AddPolicyHandler(CreateTimeoutPolicy("Accounts:Endpoints:GetCustomerDetails", configuration));
@@ -45,7 +45,7 @@ namespace ApiDemo.Api
             var baseUrl = configuration.GetValue<string>($"Services:Shipping:BaseUrl");
 
             services
-                .AddHttpClient<ICreatePackingOrderHandler, CreatePackingOrderHandler>(ConfigureHttpClient(baseUrl))
+                .AddHttpClient<ICreatePackingOrderHandler, CreatePackingOrder.Handler>(ConfigureHttpClient(baseUrl))
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5))
                 .AddPolicyHandler(CreateRetryPolicy("Shipping:Endpoints:Create", configuration))
                 .AddPolicyHandler(CreateTimeoutPolicy("Shipping:Endpoints:Create", configuration));
