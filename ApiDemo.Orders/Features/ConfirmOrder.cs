@@ -46,7 +46,7 @@ namespace ApiDemo.Api.Features
                     throw new ArgumentNullException(nameof(message));
                 }
 
-                await _validator.ValidateAndThrowAsync(message);
+                await _validator.ValidateAndThrowAsync(message, token);
 
                 // get customer identifier from orders database
                 Order order = GetOrderFromRepository(message.OrderId);
