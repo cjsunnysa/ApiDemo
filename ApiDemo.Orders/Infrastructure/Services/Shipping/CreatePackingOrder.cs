@@ -1,5 +1,6 @@
 ﻿using ApiDemo.Api.Common;
 using ApiDemo.Api.Domain.Entities;
+using FluentValidation;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,16 @@ namespace ApiDemo.Api.Infrastructure.Services.Shipping
                 if (order is null)
                 {
                     throw new ArgumentNullException(nameof(order));
+                }
+
+                if (order.Customer is null)
+                {
+                    throw new ArgumentException($"{nameof(order.Customer)} cannot be null.");
+                }
+
+                if (!order.Items.Any())
+                {
+                    throw new ArgumentException($"{nameof(order.Items)} cannot be empty.");
                 }
 
                 Address deliveryAddress = order.Customer.DeliveryAddress;
@@ -55,8 +66,13 @@ namespace ApiDemo.Api.Infrastructure.Services.Shipping
                     throw new ArgumentNullException(nameof(orderItem));
                 }
 
-                Sku = orderItem.Item.Sku;
-                ProductName = $"{orderItem.Item.Description} {orderItem.Item.Size}";
+                if (orderItem.StockItem is null)
+                {
+                    throw new ArgumentException($"{nameof(orderItem.StockItem)} cannot be null.");
+                }
+
+                Sku = orderItem.StockItem.Sku;
+                ProductName = $"{orderItem.StockItem.Description} {orderItem.StockItem.Size}";
                 Quanity = orderItem.Quantity;
             }
 
@@ -73,6 +89,11 @@ namespace ApiDemo.Api.Infrastructure.Services.Shipping
 
             public async Task<bool> Handle(Order order, CancellationToken token)
             {
+                if (order is null)
+                {
+                    throw new ArgumentNullException(nameof(order));
+                }
+
                 SetRequestHeader("Idempotency-key", Guid.NewGuid().ToString());
 
                 var command = new CreatePackingOrderCommand(order);

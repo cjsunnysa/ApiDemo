@@ -1,3 +1,5 @@
+using ApiDemo.Api.Features;
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -25,6 +27,8 @@ namespace ApiDemo.Api
             services.AddFeatures();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            
+            services.AddTransient<IValidator<ConfirmOrder.Command>, ConfirmOrder.Validator>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

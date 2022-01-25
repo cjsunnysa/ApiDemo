@@ -15,21 +15,39 @@ namespace ApiDemo.Api.Features
             public int OrderId { get; init; }
         }
 
+        public class Validator : AbstractValidator<Command>
+        {
+            public Validator()
+            {
+                RuleFor(c => c.OrderId).GreaterThanOrEqualTo(1).WithMessage(c => $"{nameof(c.OrderId)} field must be greater than 1.");
+            }
+        }
+
         public class Handler : IRequestHandler<Command, OrderDto>
         {
             private readonly IGetCustomerDetailsHandler _getCustomerDetailsHandler;
             private readonly ICreatePackingOrderHandler _createPackingOrderHandler;
+            private readonly IValidator<Command> _validator;
 
             public Handler(
                 IGetCustomerDetailsHandler getCustomerDetailsHandler, 
-                ICreatePackingOrderHandler createShippingHandler)
+                ICreatePackingOrderHandler createShippingHandler,
+                IValidator<Command> validator)
             {
                 _getCustomerDetailsHandler = getCustomerDetailsHandler;
                 _createPackingOrderHandler = createShippingHandler;
+                _validator = validator;
             }
 
             public async Task<OrderDto> Handle(Command message, CancellationToken token)
             {
+                if (message is null)
+                {
+                    throw new ArgumentNullException(nameof(message));
+                }
+
+                await _validator.ValidateAndThrowAsync(message);
+
                 // get customer identifier from orders database
                 Order order = GetOrderFromRepository(message.OrderId);
 
@@ -46,6 +64,16 @@ namespace ApiDemo.Api.Features
 
             private static OrderDto MapToOrderDto(Order order)
             {
+                if (order is null)
+                {
+                    throw new ArgumentNullException(nameof(order));
+                }
+
+                if (order.Customer is null)
+                {
+                    throw new ArgumentException($"{nameof(order.Customer)} cannot be null.");
+                }
+
                 var deliveryAddress = order.Customer.DeliveryAddress;
 
                 return new OrderDto
@@ -66,8 +94,8 @@ namespace ApiDemo.Api.Features
                             .Select(i => new OrderItemDto 
                             { 
                                 Id = i.Id,
-                                ItemDescription = i.Item.Description,
-                                ItemSize = i.Item.Size,
+                                ItemDescription = i.StockItem.Description,
+                                ItemSize = i.StockItem.Size,
                                 Quantity = i.Quantity
                             })
                             .ToArray(),
@@ -86,7 +114,7 @@ namespace ApiDemo.Api.Features
                         {
                             Id = 694939292,
                             Quantity = 2,
-                            Item = new StockItem
+                            StockItem = new StockItem
                             {
                                 Id = 320030218,
                                 Sku = "1920000000008920",
@@ -98,7 +126,7 @@ namespace ApiDemo.Api.Features
                         {
                             Id = 694939293,
                             Quantity = 12,
-                            Item = new StockItem
+                            StockItem = new StockItem
                             {
                                 Id = 320030218,
                                 Sku = "1920000000002914",
