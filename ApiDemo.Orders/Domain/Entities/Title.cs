@@ -41,13 +41,13 @@ namespace ApiDemo.Api.Domain.Entities
         }
 
         public static Title Mr => new (1, "Mr.");
-        public static Title Mrs => new (1, "Mrs.");
-        public static Title Ms => new (1, "Ms.");
-        public static Title Jr => new (1, "Jr.");
-        public static Title Dr => new (1, "Dr.");
-        public static Title Prof => new (1, "Prof.");
-        public static Title Esq => new (1, "Esq.");
-        public static Title Hon => new (1, "Hon.");
-        public static Title Sir => new (1, "Sir");
+        public static Title Mrs => new (2, "Mrs.");
+        public static Title Ms => new (3, "Ms.");
+        public static Title Jr => new (4, "Jr.");
+        public static Title Dr => new (5, "Dr.");
+        public static Title Prof => new (6, "Prof.");
+        public static Title Esq => new (7, "Esq.");
+        public static Title Hon => new (8, "Hon.");
+        public static Title Sir => new (9, "Sir");
     }
 }
