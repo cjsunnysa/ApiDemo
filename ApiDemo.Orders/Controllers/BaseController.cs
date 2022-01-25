@@ -18,7 +18,7 @@ namespace ApiDemo.Api.Controllers
 
             if (!Guid.TryParse(HttpContext.Request.Headers["Idempotency-key"].ToString(), out var idempotencyKey))
             {
-                throw new BadRequestException("The IdempotencyKey header is invalid.");
+                throw new BadRequestException("The Idempotency-key header is invalid.");
             }
 
             if (!_completedRequests.ContainsKey(methodName))
