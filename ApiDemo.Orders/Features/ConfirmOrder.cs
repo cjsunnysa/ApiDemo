@@ -74,7 +74,7 @@ namespace ApiDemo.Api.Features
                     throw new ArgumentException($"{nameof(order.Customer)} cannot be null.");
                 }
 
-                var deliveryAddress = order.Customer.DeliveryAddress;
+                Address deliveryAddress = order.Customer.DeliveryAddress;
 
                 return new OrderDto
                 {

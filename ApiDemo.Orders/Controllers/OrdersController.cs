@@ -26,11 +26,11 @@ namespace ApiDemo.Api.Controllers
         [Route("{orderId:int:min(1)}/confirmations")]
         public async Task<IActionResult> Confirm(int orderId, CancellationToken cancellationToken)
         {
-            var methodName = "orders/confirmations";
+            string methodName = "orders/confirmations";
             
             ValidateIdempotencyKey(methodName);
-            
-            var command = new Command { OrderId = orderId };
+
+            Command command = new() { OrderId = orderId };
 
             OrderDto orderDto = await _confirmOrder.Handle(command, cancellationToken);
 

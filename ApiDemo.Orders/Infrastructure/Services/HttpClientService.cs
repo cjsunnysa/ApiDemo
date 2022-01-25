@@ -18,16 +18,16 @@ namespace ApiDemo.Api.Infrastructure.Services
 
         protected async Task<TResponse> Get<TResponse>(string url, CancellationToken cancellationToken)
         {
-            var body = await _httpClient.GetStringAsync(url, cancellationToken);
+            string body = await _httpClient.GetStringAsync(url, cancellationToken);
 
             return JsonConvert.DeserializeObject<TResponse>(body);
         }
 
         protected async Task<TResponse> Post<TResponse>(string url, HttpContent content, CancellationToken cancellationToken)
         {
-            var response = await _httpClient.PostAsync(url, content, cancellationToken);
+            HttpResponseMessage response = await _httpClient.PostAsync(url, content, cancellationToken);
 
-            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            string body = await response.Content.ReadAsStringAsync(cancellationToken);
 
             return JsonConvert.DeserializeObject<TResponse>(body);
         }

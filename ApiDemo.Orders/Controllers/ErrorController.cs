@@ -40,18 +40,18 @@ namespace ApiDemo.Api.Controllers
         
         private IActionResult CreateResult(IWebHostEnvironment environment)
         {
-            var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
+            IExceptionHandlerFeature context = HttpContext.Features.Get<IExceptionHandlerFeature>();
 
             return CreateResultFromException(context.Error, environment.EnvironmentName);
         }
 
         private static IActionResult CreateResultFromException(Exception ex, string environment)
         {
-            var exceptionType = ex.GetType();
+            Type exceptionType = ex.GetType();
 
             if (_exceptionHandlers.ContainsKey(exceptionType))
             {
-                var handler = _exceptionHandlers[exceptionType];
+                Func<Exception, IActionResult> handler = _exceptionHandlers[exceptionType];
 
                 return handler.Invoke(ex);
             }
@@ -61,9 +61,9 @@ namespace ApiDemo.Api.Controllers
 
         private static IActionResult CreateResultFromNotFoundException(Exception ex)
         {
-            var exception = (NotFoundException)ex;
+            NotFoundException exception = (NotFoundException)ex;
 
-            var problem = new ProblemDetails()
+            ProblemDetails problem = new()
             {
                 Title = "The specified resource was not found.",
                 Detail = exception.Message
@@ -74,18 +74,18 @@ namespace ApiDemo.Api.Controllers
 
         private static IActionResult CreateResultFromValidationException(Exception ex)
         {
-            var exception = (ValidationException)ex;
+            ValidationException exception = (ValidationException)ex;
 
-            var problem = new ValidationProblemDetails(exception.Errors);
+            ValidationProblemDetails problem = new(exception.Errors);
 
             return new BadRequestObjectResult(problem);
         }
 
         private static IActionResult CreateResultFromBadRequestException(Exception ex)
         {
-            var exception = (BadRequestException)ex;
+            BadRequestException exception = (BadRequestException)ex;
 
-            var problem = new ProblemDetails
+            ProblemDetails problem = new()
             {
                 Title = "The request is invalid.",
                 Detail= exception.Message
@@ -96,9 +96,9 @@ namespace ApiDemo.Api.Controllers
 
         private static IActionResult CreateResultFromConflictException(Exception ex)
         {
-            var exception = (ConflictException)ex;
+            ConflictException exception = (ConflictException)ex;
 
-            var problem = new ProblemDetails
+            ProblemDetails problem = new()
             {
                 Title = "A conflict has occurred for this request.",
                 Detail = exception.Message
@@ -109,7 +109,7 @@ namespace ApiDemo.Api.Controllers
 
         private static IActionResult CreateResultFromUnknownException(Exception ex, string environment)
         {
-            var problem =
+            ProblemDetails problem =
                 environment == "Development"
                 ? CreateDetailedProblemFromUnkownException(ex)
                 : CreateProblemFromUnknownException(ex);
@@ -136,7 +136,7 @@ namespace ApiDemo.Api.Controllers
                 throw new ArgumentNullException(nameof(ex));
             }
 
-            var problem = new ProblemDetails
+            ProblemDetails problem = new()
             {
                 Title = ex.Message,
                 Status = StatusCodes.Status500InternalServerError,

@@ -78,7 +78,7 @@ namespace ApiDemo.Api.Infrastructure.Services
 
             public async Task<Customer> Handle(int id, CancellationToken cancellationToken)
             {
-                var customerDetails = await Get<CustomerDetailsDto>($"api/customers/{id}", cancellationToken);
+                CustomerDetailsDto customerDetails = await Get<CustomerDetailsDto>($"api/customers/{id}", cancellationToken);
 
                 return customerDetails.MapToCustomer();
             }

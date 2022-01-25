@@ -16,7 +16,7 @@ namespace ApiDemo.Api.Controllers
                 throw new BadRequestException("The request is missing the Idempotency-key header.");
             }
 
-            if (!Guid.TryParse(HttpContext.Request.Headers["Idempotency-key"].ToString(), out var idempotencyKey))
+            if (!Guid.TryParse(HttpContext.Request.Headers["Idempotency-key"].ToString(), out Guid idempotencyKey))
             {
                 throw new BadRequestException("The Idempotency-key header is invalid.");
             }
@@ -28,7 +28,7 @@ namespace ApiDemo.Api.Controllers
                 return;
             }
 
-            var successKeys = _completedRequests[methodName];
+            List<Guid> successKeys = _completedRequests[methodName];
 
             if (successKeys.Contains(idempotencyKey))
             {
@@ -38,7 +38,7 @@ namespace ApiDemo.Api.Controllers
 
         protected void SetIdempotentRequestCompleted(string methodName)
         {
-            if (!Guid.TryParse(HttpContext.Request.Headers["Idempotency-key"].ToString(), out var idempotencyKey))
+            if (!Guid.TryParse(HttpContext.Request.Headers["Idempotency-key"].ToString(), out Guid idempotencyKey))
             {
                 throw new BadRequestException("The IdempotencyKey header is invalid.");
             }
@@ -48,7 +48,7 @@ namespace ApiDemo.Api.Controllers
                 _completedRequests.Add(methodName, new List<Guid>());
             }
 
-            var successKeys = _completedRequests[methodName];
+            List<Guid> successKeys = _completedRequests[methodName];
 
             if (!successKeys.Contains(idempotencyKey))
             {

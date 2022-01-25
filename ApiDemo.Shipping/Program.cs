@@ -1,8 +1,8 @@
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-var app = builder.Build();
+WebApplication? app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
@@ -10,7 +10,7 @@ app.UseHttpsRedirection();
 
 app.MapPost("/api/packing-orders", async (http) =>
 {
-    var packingOrder = await http.Request.ReadFromJsonAsync<PackingOrder>(http.RequestAborted);
+    global::PackingOrder? packingOrder = await http.Request.ReadFromJsonAsync<PackingOrder>(http.RequestAborted);
     
     http.Response.StatusCode = StatusCodes.Status204NoContent;
 });

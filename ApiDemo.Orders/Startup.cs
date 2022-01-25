@@ -33,7 +33,7 @@ namespace ApiDemo.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var errorPath = env.IsDevelopment() ? "/error-dev" : "/error";
+            string errorPath = env.IsDevelopment() ? "/error-dev" : "/error";
             
             app.UseExceptionHandler(errorPath);
             

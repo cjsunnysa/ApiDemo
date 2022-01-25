@@ -96,11 +96,11 @@ namespace ApiDemo.Api.Infrastructure.Services.Shipping
 
                 SetRequestHeader("Idempotency-key", Guid.NewGuid().ToString());
 
-                var command = new CreatePackingOrderCommand(order);
+                CreatePackingOrderCommand command = new(order);
 
-                var serializedRequest = JsonConvert.SerializeObject(command);
-            
-                var content = new StringContent(serializedRequest, Encoding.UTF8, "application/json");
+                string serializedRequest = JsonConvert.SerializeObject(command);
+
+                StringContent content = new(serializedRequest, Encoding.UTF8, "application/json");
 
                 await Post("api/packing-orders", content, token);
 

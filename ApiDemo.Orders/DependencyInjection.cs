@@ -29,7 +29,7 @@ namespace ApiDemo.Api
 
         private static IServiceCollection AddHttpClientForGetCustomerDetails(this IServiceCollection services, IConfiguration configuration)
         {
-            var baseUrl = configuration.GetValue<string>($"Services:Accounts:BaseUrl");
+            string baseUrl = configuration.GetValue<string>($"Services:Accounts:BaseUrl");
 
             services
                 .AddHttpClient<IGetCustomerDetailsHandler, GetCustomerDetails.Handler>(ConfigureHttpClient(baseUrl))
@@ -42,7 +42,7 @@ namespace ApiDemo.Api
 
         private static IServiceCollection AddHttpClientForCreateShipping(this IServiceCollection services, IConfiguration configuration)
         {
-            var baseUrl = configuration.GetValue<string>($"Services:Shipping:BaseUrl");
+            string baseUrl = configuration.GetValue<string>($"Services:Shipping:BaseUrl");
 
             services
                 .AddHttpClient<ICreatePackingOrderHandler, CreatePackingOrder.Handler>(ConfigureHttpClient(baseUrl))
@@ -61,9 +61,9 @@ namespace ApiDemo.Api
 
         private static IAsyncPolicy<HttpResponseMessage> CreateRetryPolicy(string serviceName, IConfiguration configuration)
         {
-            var configurationSection = $"Services:{serviceName}:RetryOnTransientError";
+            string configurationSection = $"Services:{serviceName}:RetryOnTransientError";
 
-            var config = new RetryPolicy.Config
+            RetryPolicy.Config config = new()
             {
                 IsEnabled = configuration.GetValue<bool>($"{configurationSection}:Enabled"),
                 NumberOfRetries = configuration.GetValue<int>($"{configurationSection}:NumberOfRetries"),
@@ -76,9 +76,9 @@ namespace ApiDemo.Api
 
         private static IAsyncPolicy<HttpResponseMessage> CreateTimeoutPolicy(string serviceName, IConfiguration configuration)
         {
-            var timeout = configuration.GetValue<int>($"Services:{serviceName}:TimeoutSeconds");
+            int timeout = configuration.GetValue<int>($"Services:{serviceName}:TimeoutSeconds");
 
-            var config = new TimeoutPolicy.Config
+            TimeoutPolicy.Config config = new()
             {
                 Seconds = timeout
             };
