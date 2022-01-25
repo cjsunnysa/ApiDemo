@@ -22,12 +22,10 @@ namespace ApiDemo.Api.Domain.Entities
 
         public static Title From(int id)
         {
-            if (!_titles.Select(t => t.Id).Contains(id))
-            {
-                throw new InvalidTitleException(id);
-            }
-
-            return new Title(id, _titles.First(t => t.Id == id).Description);
+            return 
+                !_titles.Select(t => t.Id).Contains(id)
+                ? throw new InvalidTitleException(id)
+                : new Title(id, _titles.First(t => t.Id == id).Description);
         }
 
         public static implicit operator string(Title title)

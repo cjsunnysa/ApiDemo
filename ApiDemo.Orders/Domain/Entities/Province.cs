@@ -32,12 +32,10 @@ namespace ApiDemo.Api.Domain.Entities
 
         public static Province From(int id)
         {
-            if (!_provinces.Select(p => p.Id).Contains(id))
-            {
-                throw new InvalidProvinceException(id);
-            }
-
-            return new Province(id, _provinces.First(p => p.Id == id).Name);
+            return 
+                !_provinces.Select(p => p.Id).Contains(id)
+                ? throw new InvalidProvinceException(id)
+                : new Province(id, _provinces.First(p => p.Id == id).Name);
         }
 
         public static Province Gauteng => new (1, "Gauteng");
