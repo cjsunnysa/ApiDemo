@@ -1,7 +1,5 @@
-﻿using ApiDemo.Api.Common;
-using Newtonsoft.Json;
-using System;
-using System.Net.Http;
+﻿using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,7 +18,7 @@ namespace ApiDemo.Api.Infrastructure.Services
         {
             string body = await _httpClient.GetStringAsync(url, cancellationToken);
 
-            return JsonConvert.DeserializeObject<TResponse>(body);
+            return JsonSerializer.Deserialize<TResponse>(body);
         }
 
         protected async Task<TResponse> Post<TResponse>(string url, HttpContent content, CancellationToken cancellationToken)
@@ -29,7 +27,7 @@ namespace ApiDemo.Api.Infrastructure.Services
 
             string body = await response.Content.ReadAsStringAsync(cancellationToken);
 
-            return JsonConvert.DeserializeObject<TResponse>(body);
+            return JsonSerializer.Deserialize<TResponse>(body);
         }
 
         protected async Task<HttpResponseMessage> Post(string url, HttpContent content, CancellationToken cancellationToken)

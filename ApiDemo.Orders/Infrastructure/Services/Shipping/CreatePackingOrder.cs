@@ -1,12 +1,11 @@
 ﻿using ApiDemo.Api.Common;
 using ApiDemo.Api.Domain.Entities;
-using FluentValidation;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -98,7 +97,7 @@ namespace ApiDemo.Api.Infrastructure.Services.Shipping
 
                 CreatePackingOrderCommand command = new(order);
 
-                string serializedRequest = JsonConvert.SerializeObject(command);
+                string serializedRequest = JsonSerializer.Serialize(command);
 
                 StringContent content = new(serializedRequest, Encoding.UTF8, "application/json");
 
